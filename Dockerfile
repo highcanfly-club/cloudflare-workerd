@@ -29,5 +29,8 @@ RUN pnpm install
 RUN pnpm exec bazelisk build --sandbox_debug --remote_cache=${REMOTE_CACHE_URL} --remote_cache_compression -c opt //src/workerd/server:workerd
 
 FROM scratch as artifact
-COPY --from=builder /workerd/bazel-bin/src/workerd/server/workerd /workerd
-CMD ["/workerd"]
+COPY --from=builder /workerd/bazel-bin/src/workerd/server/workerd /usr/bin/workerd
+
+FROM debian:bullseye-slim
+COPY --from=builder /workerd/bazel-bin/src/workerd/server/workerd /usr/bin/workerd
+ENTRYPOINT ["/usr/bin/workerd"]

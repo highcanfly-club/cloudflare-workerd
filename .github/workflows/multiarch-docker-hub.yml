@@ -45,10 +45,12 @@ jobs:
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4.0.0
+        env:
+          REMOTE_CACHE_URL: ${{ secrets.DOCKER_REMOTE_CACHE_URL }}
         with:
           context: .
           build-args: |
-            REMOTE_CACHE_URL="${{ secrets.DOCKER_REMOTE_CACHE_URL }}"
+            REMOTE_CACHE_URL="${REMOTE_CACHE_URL}"
           platforms: linux/arm64, linux/amd64
           push: true
           tags: ${{ steps.get_latest_tag.outputs.tags }},latest
