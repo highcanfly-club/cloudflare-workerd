@@ -2,14 +2,23 @@
 # Run: docker run -it --rm highcanfly/cloudflare-workerd
 FROM node:bullseye AS builder
 
-
+ARG FORCED_VERSION
 ARG REMOTE_CACHE_URL
-RUN apt-get update
-RUN apt-get install -y curl build-essential git lsb-release wget software-properties-common gnupg tcl
-RUN LATEST_TAG=$(curl --silent "https://api.github.com/repos/cloudflare/workerd/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') && \
+RUN if [ -n "$FORCED_VERSION" ]; then \
+        export LATEST_TAG=$FORCED_VERSION;  \
+    else \
+        export LATEST_TAG=$(curl --silent "https://api.github.com/repos/cloudflare/workerd/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'); \
+    fi && \
     echo $LATEST_TAG && \
-    echo $LATEST_TAG  > /workerd_version && \
+    echo $LATEST_TAG  > /workerd_version
+
+RUN apt-get update
+RUN apt-get install -y curl build-essential git lsb-release wget software-properties-common gnupg tcl libc++-dev libc++abi-dev
+
+RUN export LATEST_TAG=$(cat /workerd_version) && \
     cd / && \
+    echo "Building version $LATEST_TAG" && \
+    cat /workerd_version && \
     git clone https://github.com/cloudflare/workerd.git && \
     cd /workerd && \
     git checkout $LATEST_TAG
