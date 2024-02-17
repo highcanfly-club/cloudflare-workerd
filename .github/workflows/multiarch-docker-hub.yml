@@ -55,7 +55,7 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/arm64, linux/amd64
           push: true
-          tags: ${{ steps.get_latest_tag.outputs.tags }},latest
+          tags: highcanfly/cloudflare-workerd:${{ steps.get_latest_tag.outputs.tag }},highcanfly/cloudflare-workerd:latest
           labels: ${{ steps.meta.outputs.labels }}
           
 
